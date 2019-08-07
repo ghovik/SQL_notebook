@@ -6,18 +6,6 @@
 
 Installed: MySQL 8.0.17.
 
-## Teach yourself SQL
-
-Create new database (schema) `tysql`: 
-
-```
-CREATE SCHEMA `tysql` ;
-```
-
-
-
-## SQL 必知必会
-
 ### 1.1.2 Tools for SQL
 
 installed: Navicat 10.0.11 enterprise, and MySQL Workbench 8.0 CE.
