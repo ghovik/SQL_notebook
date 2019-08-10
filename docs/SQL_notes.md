@@ -843,7 +843,7 @@ where emp.managerid = mgr.id and emp.salary > mgr.salary;
 
 #### Q: Error 1251 when connecting to localhost database.
 
-![](img\navicat_error.png)
+![](img/navicat_error.png)
 
 A: Change MySQL authentication method back to `mysql_native_password`, according to [this post](https://blog.csdn.net/seventopalsy/article/details/80195246).
 
