@@ -603,6 +603,8 @@ The resulting number of rows will be the number of rows in table `loan` by numbe
 
 ##### LEFT JOIN
 
+A reference [post](https://www.javatpoint.com/mysql-join).
+
 The `LEFT JOIN` keyword returns all records from the left table (table1), and the matched records from the right table (table2). The result is NULL from the right side, if there is no match.
 
 For the same example, we perform `LEFT JOIN`:
@@ -836,6 +838,200 @@ select emp.name as employee
 from employee emp, employee mgr
 where emp.managerid = mgr.id and emp.salary > mgr.salary;
 ```
+
+
+
+# MySQL Assignment 3 (due: 13 Aug 9am EST)
+
+## 3.1 Data import and export
+
+### 3.1.1 Export a MySQL table to a .csv file
+
+This [post](http://www.mysqltutorial.org/mysql-export-table-to-csv/) introduced a few ways to do the task.
+
+We used the simplest way, which is provided by MySQL Workbench to export a table to a .csv file.
+
+Steps:
+
+* Right click the target table, select 'Table Data Export Wizard';
+* In the popped out window, select all the columns we'd like to export, then next;
+* Specify file path, name, and type (two options: csv or json). Make sure that 'Field Separator' is ',', the default option is ';', which leads to all columns filled into a single cell.
+* For the remaining steps, simply click next.
+
+### 3.1.2 Import a MySQL table from a .csv file
+
+Similarly, we use workbench to import a table form a .csv file.
+
+Steps:
+
+* Right click any table, select 'Table Data Import Wizard';
+* Specify which .csv file we want to import from;
+* Select 'Create new table', then specify a database and a table name;
+* Adjust the settings based on your requirements, then all the way next.
+
+
+
+## Exercises 4
+
+### 10 Employees with highest salaries in each department
+
+```mysql
+select dep.name as department, emp.name as employee, emp.salary as salary
+from department dep, employee_ex4 emp
+where emp.departmentid = dep.id;
+```
+
+Result:
+
+| department | employee | salary |
+| ---------- | -------- | ------ |
+| IT         | Joe      | 70000  |
+| Sales      | Henry    | 80000  |
+| Sales      | Sam      | 60000  |
+| IT         | Max      | 90000  |
+
+```mysql
+select dep.name as department, max(emp.salary) as salary
+from department dep
+left join employee_ex4 emp
+on emp.departmentid = dep.id
+group by dep.id;
+```
+
+Result:
+
+| department | salary |
+| ---------- | ------ |
+| IT         | 90000  |
+| Sales      | 80000  |
+
+```mysql
+select dep.name as department, emp.name as employee, emp.salary as salary
+from department dep
+inner join employee_ex4 emp
+on emp.departmentid = dep.id
+where salary in (
+	select max(emp1.salary) 
+    from employee_ex4 emp1 
+    where emp1.departmentid = dep.id
+);
+```
+
+Result:
+
+| department | employee | salary |
+| ---------- | -------- | ------ |
+| Sales      | Henry    | 80000  |
+| IT         | Max      | 90000  |
+
+
+
+### 11 Swap seats
+
+```mysql
+select id + 1 as id, student from seat where id%2 = 1 and id <> (select max(id) from seat)
+union
+select id - 1 as id, student from seat where id%2 = 0
+union
+select id, student from seat where id = (select max(id) from seat)
+order by id
+```
+
+
+
+### 12 Rank scores
+
+```mysql
+(select distinct Score from scores)
+```
+
+| Score |
+| ----- |
+| 3.5   |
+| 3.65  |
+| 4     |
+| 3.85  |
+
+```mysql
+select scores.Score, count(ranking.Score) ranks
+from scores, (select distinct Score from scores) ranking
+where ranking.score>=scores.Score
+group by scores.Id
+```
+
+| Score | ranks |
+| ----- | ----- |
+| 3.5   | 4     |
+| 3.65  | 3     |
+| 3.65  | 3     |
+| 4     | 1     |
+| 3.85  | 2     |
+| 4     | 1     |
+
+The above table describes the number of scores that are greater or equal to each score record. It is almost done. For the last step, we only need to add `order by ranks` to the end of the statement.
+
+````mysql
+select scores.Score, count(ranking.Score)  ranks
+from scores, (select distinct Score from scores) ranking
+where ranking.score>=scores.Score
+group by scores.Id
+order by ranks
+````
+
+Detailed explanation is found [here](https://stackoverflow.com/questions/48837762/rank-scores-leetcode-178).
+
+
+
+### 13 Consecutive numbers
+
+
+
+### 14 Tree node
+
+```mysql
+select id, 'root' as Type
+from tree
+where p_id is null
+union 
+select id, 'leaf' as Type
+from tree
+where 
+	id is not null and
+    id not in (select p_id from tree where p_id is not null)   
+union    
+select id, 'inner' as Type
+from tree
+where 
+	p_id is not null and
+    id in (select p_id from tree where p_id is not null)
+order by id
+```
+
+| id   | Type  |
+| ---- | ----- |
+| 1    | root  |
+| 2    | inner |
+| 3    | leaf  |
+| 4    | leaf  |
+| 5    | leaf  |
+
+
+
+### 15 Find managers who have at least 5 direct subordinates
+
+```mysql
+select name 
+from employee_15 
+where id =
+	(SELECT
+		ManagerId
+	FROM
+		employee_15
+	GROUP BY ManagerId
+	HAVING COUNT(ManagerId) >= 5);
+```
+
+
 
 
 
