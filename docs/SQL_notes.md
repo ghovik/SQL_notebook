@@ -1033,6 +1033,81 @@ where id =
 
 
 
+# MySQL Assignment 4 (due: 15 Aug 10am EST)
+
+## Exercise 4
+
+### 16 Rank scores
+
+```mysql
+SELECT
+    obj_new.id,
+    obj_new.score,
+    obj_new.rownum
+FROM
+    (
+        SELECT
+            obj.id,
+            obj.score,
+            @rownum := @rownum + 1 AS num_tmp,
+            @incrnum := CASE
+        WHEN @rowtotal = obj.score THEN
+            @incrnum
+        WHEN @rowtotal := obj.score THEN
+            @rownum
+        END AS rownum
+        FROM
+            (
+                SELECT
+                    id,
+                    score
+                FROM
+                    scores
+                ORDER BY
+                    score DESC
+            ) AS obj,
+            (
+                SELECT
+                    @rownum := 0 ,@rowtotal := NULL ,@incrnum := 0
+            ) r
+    ) AS obj_new
+```
+
+
+
+### 17 The question with highest answer rate
+
+```mysql
+SELECT 
+    question_id AS 'survey_log'
+FROM
+    survey_log
+GROUP BY question_id
+ORDER BY COUNT(answer_id) / COUNT(IF(action = 'show', 1, 0)) DESC
+LIMIT 1;
+```
+
+
+
+### 18 Top 3 highest salary employees
+
+
+
+### 19 Shortest distance on the surface
+
+```mysql
+SELECT ROUND(SQRT(MIN((POW(p1.x - p2.x, 2) + POW(p1.y - p2.y, 2)))), 2) AS shortest
+FROM point_2d p1
+JOIN point_2d p2 
+ON p1.x != p2.x OR p1.y != p2.y
+```
+
+
+
+### 20 Trips and users
+
+
+
 
 
 ## Questions
